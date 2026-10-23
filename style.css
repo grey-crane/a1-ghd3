@@ -1,0 +1,28 @@
+body {
+  background-color: lightgrey;
+}
+
+#container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2em;
+}
+
+#border {
+  fill: none;
+  stroke: black;
+  stroke-width: 10px;
+}
+
+.key-label {
+  fill: black;
+  font-size: 4em;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.key-sector {
+  stroke-width: 2;
+}
