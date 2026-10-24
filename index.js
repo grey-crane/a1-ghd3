@@ -6,14 +6,34 @@ const circleOfFifths = [
   "D",
   "A",
   "E",
-  "B",
-  "F#/Gb",
-  "C#/Db",
+  "B/Cb",
+  "Gb/F#",
+  "Db/C#",
   "Ab",
   "Eb",
   "Bb",
   "F",
 ];
+const labelId = "#accidentals";
+
+const accidentals = (root) => {
+  const orderOfSharps = ["F", "C", "G", "D", "A", "E", "B"];
+  const g = d3.create("svg:g").attr("id", "accidentals");
+  if (!root) return g.node();
+  const index = circleOfFifths.indexOf(root);
+  if (index < 0) return g.node();
+
+  const addLine = (str, y) =>
+    g.append("text").attr("class", "label text").attr("y", y).text(str);
+
+  if (index <= 7) {
+    addLine(orderOfSharps.slice(0, index).map((n) => n + "#").join(" "), 0);
+  }
+  if (index >= 5) {
+    addLine([...orderOfSharps].reverse().slice(0, 12 - index).map((n) => n + "b").join(" "), 40);
+  }
+  return g.node();
+};
 
 // Declare the chart dimensions and margins.
 const chart = (() => {
@@ -37,7 +57,7 @@ const chart = (() => {
     // center origin in viewBox
     .attr("viewBox", `${-width / 2} ${-height / 2} ${width} ${height}`);
 
-  // border
+  // border 
   svg.append("rect")
     .attr("id", "border")
     .attr("x", border.x)
@@ -53,7 +73,7 @@ const chart = (() => {
 
   const sideToAngle = (sideN) => {
     // puts first item at top of circle
-    return (sideN / sideTotal) * 2 * Math.PI - (7 * Math.PI) / 12;
+    return (sideN / sideTotal) * 2 * Math.PI - (Math.PI / 12);
   };
 
   const sectionBox = (aStart, aEnd) => {
@@ -65,8 +85,8 @@ const chart = (() => {
         { angle: aStart, radius: outerR },
       ],
       center: {
-        x: ((innerR + outerR) / 2) * Math.cos((aStart + aEnd) / 2),
-        y: ((innerR + outerR) / 2) * Math.sin((aStart + aEnd) / 2),
+        x: ((innerR + outerR) / 2) * Math.sin((aStart + aEnd) / 2),
+        y: (-(innerR + outerR) / 2) * Math.cos((aStart + aEnd) / 2),
       },
     };
   };
@@ -84,21 +104,27 @@ const chart = (() => {
       .attr("class", "key-sector")
       .attr("fill", color(i))
       .attr("stroke", "black")
-      .on("mouseover", function (event, d) {
-        d3.select(this).attr("stroke", "white").raise();
+      .on("mouseover", (event, d) => {
+        d3.select(event.currentTarget).attr("stroke", "white").raise();
+        document.querySelector(labelId).replaceWith(accidentals(key));
       })
-      .on("mouseleave", function (event, d) {
-        d3.select(this).attr("stroke", "black");
+      .on("mouseleave", (event, d) => {
+        d3.select(event.currentTarget).attr("stroke", "black");
+        document.querySelector(labelId).replaceWith(accidentals(undefined));
       });
 
     labels
       .append("text")
       .text(key)
-      .attr("class", "key-label")
+      .attr("class", "label key")
       .attr("x", sector.center.x)
-      .attr("y", sector.center.y)
-  });
+      .attr("y", sector.center.y);
+ });
 
+  labels.append("g")
+    .attr("x", 0)
+    .attr("y", 0)
+    .append(() => accidentals()); // empty group to be replaced
   return svg.node();
 })();
 

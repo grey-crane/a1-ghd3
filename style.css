@@ -15,12 +15,20 @@ body {
   stroke-width: 10px;
 }
 
-.key-label {
+.label {
   fill: black;
   font-size: 4em;
   text-anchor: middle;
   dominant-baseline: middle;
   pointer-events: none;
+}
+
+.key {
+  font-size: 4em;
+}
+
+.text {
+  font-size: 2em;
 }
 
 .key-sector {
