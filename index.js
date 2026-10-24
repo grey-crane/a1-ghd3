@@ -14,26 +14,24 @@ const circleOfFifths = [
   "Bb",
   "F",
 ];
-const labelId = "#accidentals";
 
-const accidentals = (root) => {
+const accidentals = (root = null) => {
   const orderOfSharps = ["F", "C", "G", "D", "A", "E", "B"];
-  const g = d3.create("svg:g").attr("id", "accidentals");
-  if (!root) return g.node();
+  let lines = ["Accidentals"]
+  if (root === null) return []; // get empty array
+  const currentY = 0;
   const index = circleOfFifths.indexOf(root);
-  if (index < 0) return g.node();
-
-  const addLine = (str, y) =>
-    g.append("text").attr("class", "label text").attr("y", y).text(str);
+  if (index < 0) return [];
 
   if (index <= 7) {
-    addLine(orderOfSharps.slice(0, index).map((n) => n + "#").join(" "), 0);
+    lines.push(orderOfSharps.slice(0, index).map((n) => n + "#").join(" "));
   }
   if (index >= 5) {
-    addLine([...orderOfSharps].reverse().slice(0, 12 - index).map((n) => n + "b").join(" "), 40);
+    lines.push([...orderOfSharps].reverse().slice(0, 12 - index).map((n) => n + "b").join(" "));
   }
-  return g.node();
+  return lines;
 };
+
 
 // Declare the chart dimensions and margins.
 const chart = (() => {
@@ -65,6 +63,19 @@ const chart = (() => {
     .attr("width", border.width)
     .attr("height", border.height);
 
+  const sectors = svg.append("g").attr("id", "sectors");
+  const labels = svg.append("g").attr("id", "labels"); // keeps labels always visible
+  const accidentalsLabel = labels.append("g").attr("id", "accidentals");
+
+  const updateAccidentals = (root) => {
+    accidentalsLabel
+      .selectAll("text")
+      .data(accidentals(root))
+      .join("text")
+      .attr("class", "label text")
+      .attr("y", (d, i) => i * 40 - 40) // for multi line items
+      .text((d) => d);
+  };
   // experienced some issues with areaRadial
   const section = d3.lineRadial()
     .curve(d3.curveLinearClosed)
@@ -92,8 +103,6 @@ const chart = (() => {
   };
 
   const color = d3.scaleSequential([0, sideTotal], d3.interpolateRainbow);
-  const sectors = svg.append("g").attr("id", "sectors");
-  const labels = svg.append("g").attr("id", "labels"); // keeps labels always visible
 
   circleOfFifths.forEach((key, i) => {
     const sector = sectionBox(sideToAngle(i), sideToAngle(i + 1));
@@ -106,11 +115,11 @@ const chart = (() => {
       .attr("stroke", "black")
       .on("mouseover", (event, d) => {
         d3.select(event.currentTarget).attr("stroke", "white").raise();
-        document.querySelector(labelId).replaceWith(accidentals(key));
+        updateAccidentals(key);
       })
       .on("mouseleave", (event, d) => {
         d3.select(event.currentTarget).attr("stroke", "black");
-        document.querySelector(labelId).replaceWith(accidentals(undefined));
+        updateAccidentals();
       });
 
     labels
@@ -121,10 +130,6 @@ const chart = (() => {
       .attr("y", sector.center.y);
  });
 
-  labels.append("g")
-    .attr("x", 0)
-    .attr("y", 0)
-    .append(() => accidentals()); // empty group to be replaced
   return svg.node();
 })();
 
