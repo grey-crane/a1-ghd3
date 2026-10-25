@@ -31,7 +31,11 @@ body {
   font-size: 2em;
 }
 
-.shape-lines {
+.lines {
   stroke-width: 2px;
+}
+
+.clicked {
+  stroke-width: 4px;
 }
 
