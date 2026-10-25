@@ -31,6 +31,7 @@ body {
   font-size: 2em;
 }
 
-.key-sector {
-  stroke-width: 2;
+.shape-lines {
+  stroke-width: 2px;
 }
+
