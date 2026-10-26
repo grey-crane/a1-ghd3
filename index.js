@@ -228,7 +228,8 @@ const chart = (() => {
     + "  perfect fourths). It shows the number of sharps and flats in each key, where the"
     + " uppercase letters are the major keys and the lowercase ones are the enharmonic"
     + " (equivalent) minor keys. The diagram is used as a reference when writing haromny in"
-    + " many kinds of music, as it nicely describes the elationships between various keys/chords."
+    + " many kinds of music, as it nicely describes the relationships between various keys"
+    + " and chords."
   );
   infoText.append("xhtml:p").attr("class", "info")
     .text("For more information, see ").append("xhtml:a").text("Wikipedia")
