@@ -223,18 +223,18 @@ const chart = (() => {
 
   infoText.append("xhtml:h2").attr("class", "text").text("Circle (Dodecahedron) Of Fifths");
   infoText.append("xhtml:p").attr("class", "info").text(
-    "\"In music theory, the circle of fifths (sometimes also cycle of fifths) organizes the"
-    + " twelve pitch classes of the chromatic scale in a cycle of ascending perfect fifths..."
-    + "The circle diagram shows the number of sharps or flats in each key signature, with the"
-    + " major key indicated by a capital letter and the minor key indicated by a lower-case"
-    + " letter... Harmonic progressions in Western music commonly use adjacent keys in this"
-    + " system, making it a useful reference for musical composition and harmony.\""
+    "The circle of fifths is a diagram that organizes the 12 notes of the chromatic scale in a"
+    + " cycle of clockwise ascending perfect fifths (moving counterclockwise descends by"
+    + "  perfect fourths). It shows the number of sharps and flats in each key, where the"
+    + " uppercase letters are the major keys and the lowercase ones are the enharmonic"
+    + " (equivalent) minor keys. The diagram is used as a reference when writing haromny in"
+    + " many kinds of music, as it nicely describes the elationships between various keys/chords."
   );
-  infoText.append("xhtml:p").attr("class", "info").text(" - ").append("xhtml:a")
+  infoText.append("xhtml:p").attr("class", "info")
+    .text("For more information, see ").append("xhtml:a").text("Wikipedia")
     .attr("href", "https://en.wikipedia.org/wiki/Circle_of_fifths")
     .attr("target", "_blank")
-    .attr("rel", "noopener noreferrer")
-    .text("Wikipedia");
+    .attr("rel", "noopener noreferrer");
   infoText.append("xhtml:p").attr("class", "info").text(
     "Try hovering over or clicking on on the different sections"
   );
