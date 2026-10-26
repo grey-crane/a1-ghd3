@@ -2,11 +2,16 @@ body {
   background-color: lightgrey;
 }
 
+p {
+  font-size: 20px;
+  font-color: "black";
+}
+
 #container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 2em;
+  margin: 1em;
 }
 
 #border {
@@ -15,20 +20,30 @@ body {
   stroke-width: 10px;
 }
 
+#circle {
+  fill: none;
+  stroke: black;
+  stroke-width: 4px;
+}
+
 .label {
   fill: black;
-  font-size: 4em;
   text-anchor: middle;
   dominant-baseline: middle;
   pointer-events: none;
 }
 
-.key {
+.major {
   font-size: 4em;
+}
+
+.minor {
+  font-size: 3em;
 }
 
 .text {
   font-size: 2em;
+  font-color: "black";
 }
 
 .lines {
@@ -39,3 +54,6 @@ body {
   stroke-width: 4px;
 }
 
+.hidden {
+  display: none;
+}

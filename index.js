@@ -1,18 +1,18 @@
 console.log("d3 version", d3.version); // test that d3 loaded
 
 const circleOfFifths = [
-  { major: "C", minor: "A" },
-  { major: "G", minor: "Db" },
-  { major: "D", minor: "B" },
-  { major: "A", minor: "F#" },
-  { major: "E", minor: "C#" },
-  { major: "Cb/B", minor: "Ab/G#" },
-  { major: "Gb/F#", minor: "Eb/D#" },
-  { major: "Db/C#", minor: "Bb/A#" },
-  { major: "Ab", minor: "F" },
-  { major: "Eb", minor: "C" },
-  { major: "Bb", minor: "G" },
-  { major: "F", minor: "D" },
+  { major: "C", minor: "a" },
+  { major: "G", minor: "d♭" },
+  { major: "D", minor: "b" },
+  { major: "A", minor: "f♯" },
+  { major: "E", minor: "c♯" },
+  { major: "C♭/B", minor: "a♭/g♯" },
+  { major: "G♭/F♯", minor: "e♭/d♯" },
+  { major: "D♭/C♯", minor: "b♭/a♯" },
+  { major: "A♭", minor: "f" },
+  { major: "E♭", minor: "c" },
+  { major: "B♭", minor: "g" },
+  { major: "F", minor: "d" },
 ];
 const Keys = {
   Major: "Major",
@@ -50,7 +50,6 @@ const accidentals = (root, keyType) => {
   return lines;
 };
 
-
 // Declare the chart dimensions and margins.
 const chart = (() => {
   const width = 1600;
@@ -58,13 +57,14 @@ const chart = (() => {
   const sideTotal = 12;
 
   const innerR = 200;
-  const middleR = 300;
+  const middleR = 340;
   const outerR = 500;
+  const borderMargin = 50;
   const border = {
-    x: -width/2 + 50,
-    y: -height/2 + 50,
-    width: width - 100,
-    height: height - 100,
+    x: -width/2 + borderMargin,
+    y: -height/2 + borderMargin,
+    width: width - 2*borderMargin,
+    height: height - 2*borderMargin,
   };
 
   // Create the SVG container.
@@ -73,7 +73,7 @@ const chart = (() => {
     .attr("width", width)
     .attr("height", height)
     // center origin in viewBox
-    .attr("viewBox", `${-width / 2} ${-height / 2} ${width} ${height}`);
+    .attr("viewBox", `${-width / 2} ${-height / 2} ${width} ${height}`)
 
   const section = d3.lineRadial()
     .curve(d3.curveLinearClosed)
@@ -91,14 +91,23 @@ const chart = (() => {
   const sectors = svg.append("svg:g").attr("id", "sectors");
   const labels = svg.append("svg:g").attr("id", "labels"); // keeps labels always visible
   const center = svg.append("svg:g").attr("class", "lines");
-  const accidentalsLabel = labels.append("svg:g").attr("id", "accidentals");
+  const accidentalsLabel = labels.append("svg:g").attr("id", "accidentals")
+
+  sectors
+    .append("svg:circle")
+    .attr("id", "circle")
+    .attr("cx", "0")
+    .attr("cy", "0")
+    .attr("r", "150");
 
   const updateCenter = (root = null, keyType) => {
     let strings = [];
     if (root === null) {
       strings = ["Circle", "Of", "Fifths"];
+      sectors.select("#circle").attr("class", "");
     } else {
       strings = accidentals(root, keyType);
+      sectors.select("#circle").attr("class", "hidden");
     }
     accidentalsLabel
       .selectAll("text")
@@ -179,17 +188,56 @@ const chart = (() => {
   const color = d3.scaleSequential([0, sideTotal], d3.interpolateRainbow);
   let clicked = null;
 
-  circleOfFifths.forEach((key, i) => {
+  circleOfFifths.forEach((rawKey, i) => {
+    const majorKey = rawKey.major;
+    const minorKey = rawKey.minor;
     const majSector = sectionBox(i, middleR, outerR);
     const minSector = sectionBox(i, innerR, middleR);
 
-    sectors.append(() => createSector(majSector, color(i), key.major, Keys.Major));
-    sectors.append(() => createSector(minSector, color(i), key.minor, Keys.Minor));
+    sectors.append(() => createSector(majSector, color(i), majorKey, Keys.Major));
+    sectors.append(() => createSector(minSector, color(i), minorKey, Keys.Minor));
 
-    labels.append(() => createLabel(majSector, key.major, "key label"));
-    labels.append(() => createLabel(minSector, key.minor, "text label"));
+    labels.append(() => createLabel(majSector, majorKey, "major label"));
+    labels.append(() => createLabel(minSector, minorKey, "minor label"));
   });
   updateCenter();
+
+  const shift = (border.x + outerR)+50;
+  sectors.attr("transform", `translate(${shift})`);
+  labels.attr("transform", `translate(${shift})`);
+
+  svg.append("svg:line")
+    .attr("class", "clicked")
+    .attr("stroke", "black")
+    .attr("x1", `${outerR + shift + borderMargin}`)
+    .attr("x2", `${outerR + shift + borderMargin}`)
+    .attr("y1", `${border.y + 2*borderMargin}`)
+    .attr("y2", `${border.y + border.height - 2*borderMargin}`);
+
+  const infoText = svg.append("svg:foreignObject")
+    .attr("x", `${outerR + shift + 2*borderMargin}`)
+    .attr("y", `${border.y + borderMargin}`)
+    .attr("width", `${(border.x + border.width - borderMargin) - (outerR + shift + 2*borderMargin)}`)
+    .attr("height", `${border.height - 2*borderMargin}`)
+    .append("xhtml:div").attr("xmlns", "xhtml:http://www.w3.org/1999/xhtml");
+
+  infoText.append("xhtml:h2").attr("class", "text").text("Circle (Dodecahedron) Of Fifths");
+  infoText.append("xhtml:p").attr("class", "info").text(
+    "\"In music theory, the circle of fifths (sometimes also cycle of fifths) organizes the"
+    + " twelve pitch classes of the chromatic scale in a cycle of ascending perfect fifths..."
+    + "The circle diagram shows the number of sharps or flats in each key signature, with the"
+    + " major key indicated by a capital letter and the minor key indicated by a lower-case"
+    + " letter... Harmonic progressions in Western music commonly use adjacent keys in this"
+    + " system, making it a useful reference for musical composition and harmony.\""
+  );
+  infoText.append("xhtml:p").attr("class", "info").text(" - ").append("xhtml:a")
+    .attr("href", "https://en.wikipedia.org/wiki/Circle_of_fifths")
+    .attr("target", "_blank")
+    .attr("rel", "noopener noreferrer")
+    .text("Wikipedia");
+  infoText.append("xhtml:p").attr("class", "info").text(
+    "Try hovering over or clicking on on the different sections"
+  );
 
   return svg.node();
 })();
